@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from .forms import VideoForm
+from .deepfake_pipeline.deepfake_predicion_pipeline import predict
+import os
 
 
 def index(request):
@@ -8,8 +10,12 @@ def index(request):
         if form.is_valid():
             form.save()
             video = form.instance
-            print("Video Name", video.getName())
-            result = make_prediction()
+            video_name = video.getName()
+            media_path = os.path.join(os.getcwd(),'media')
+            video_path = os.path.join(media_path,video_name)
+
+            print("Video path", video_path)
+            result = predict(video_path)
             return render(request,"result.html",{"result": result, "video": video})
     else:
         form = VideoForm()
