@@ -1,3 +1,5 @@
+from unittest import result
+from django.http import HttpResponse
 from django.shortcuts import render
 from .forms import VideoForm
 from .deepfake_pipeline.deepfake_predicion_pipeline import predict
@@ -13,10 +15,12 @@ def index(request):
             video_name = video.getName()
             media_path = os.path.join(os.getcwd(),'media')
             video_path = os.path.join(media_path,video_name)
-
-            print("Video path", video_path)
-            result = predict(video_path)
-            return render(request,"result.html",{"result": result, "video": video})
+            score = predict(video_path)
+            if score > 0.5:
+                result = "real"
+            else:
+                result = "fake"
+            return render(request,"result.html",{"result": result,"score":score})
     else:
         form = VideoForm()
     return render(request,'index.html',{"form":form})

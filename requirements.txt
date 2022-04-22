@@ -4,3 +4,4 @@ torch
 facenet-pytorch
 tensorflow
 keras
+scipy
