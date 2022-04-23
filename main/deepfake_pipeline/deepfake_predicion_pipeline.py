@@ -10,7 +10,18 @@ from keras.models import Model
 BASE_DIR = os.getcwd()
 MODEL_FOLDER = os.path.join(BASE_DIR,"main/deepfake_pipeline/trained_models")
 PROCESSED_OUTPUT_DIR = os.path.join(BASE_DIR,"main/deepfake_pipeline/processed_output")
+MODELPATH_1 = os.path.join(MODEL_FOLDER,"densenet201.h5")
+MODELPATH_2 = os.path.join(MODEL_FOLDER,"inceptionV3.h5")
+MODELPATH_3 = os.path.join(MODEL_FOLDER,"inceptionV3.h5")
+MODELPATH_4 =  os.path.join(MODEL_FOLDER,"vgg19.h5")
+ENSAMBLED_MODEL = os.path.join(MODEL_FOLDER,"ensambled_model.h5")
 
+MODEL1 = load_model(MODELPATH_1)
+MODEL2 = load_model(MODELPATH_2)
+MODEL3 = load_model(MODELPATH_3)
+MODEL4 = load_model(MODELPATH_4)
+MODEL  = load_model(ENSAMBLED_MODEL)
+members = [MODEL1, MODEL2, MODEL3, MODEL4]
 
 def extract_face_for_single_video(video_path,output_path):
     
@@ -80,12 +91,9 @@ def extract_face_for_single_video(video_path,output_path):
         if ret == True:
           try:        
               frame = frame[int(ymin):int(ymax), int(xmin):int(xmax),:]
-
               num = '_' + str(frameCount).zfill(4)
               frameCount += 1
-              #print(num)
               frame_name = video_name + num +'.jpg'  
-              #print(frame_name)
               destination = os.path.join(facePath,frame_name)
 
               cv2.imwrite(destination,frame)
@@ -194,19 +202,5 @@ def predict_from_images(list_of_models, ensambled_model, test_img_dir_path):
     return prediction
 
 def predict(input_video_path,output_folder=PROCESSED_OUTPUT_DIR):
-    print("BASE_DIR_PATH", BASE_DIR)
-    modelPath1 = os.path.join(MODEL_FOLDER,"densenet201.h5")
-    modelPath2 = os.path.join(MODEL_FOLDER,"inceptionV3.h5")
-    modelPath3 = os.path.join(MODEL_FOLDER,"inceptionV3.h5")
-    modelPath4 =  os.path.join(MODEL_FOLDER,"vgg19.h5")
-    ensambledModel = os.path.join(MODEL_FOLDER,"ensambled_model.h5")
-
-    model1 = load_model(modelPath1)
-    model2 = load_model(modelPath2)    # todo deal with this shit
-    model3 = load_model(modelPath3)
-    model4 = load_model(modelPath4)
-    model  = load_model(ensambledModel)
-
-    members = [model1, model2, model3, model4]
     test_img_dir_path = preprocessing(input_video_path,output_folder)
-    return predict_from_images(members,model,test_img_dir_path)
+    return predict_from_images(members,MODEL,test_img_dir_path)
